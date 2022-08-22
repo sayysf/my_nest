@@ -1,4 +1,5 @@
-import { AppService, IndexService } from './app.service';
+import { IndexService } from './index.service';
+import { AppService } from "./app.service";
 import { Request } from 'express';
 export declare class CatsController {
     private readonly appService;
@@ -12,7 +13,4 @@ export declare class AppController {
     private readonly appService;
     constructor(appService: IndexService);
     getHello(): Promise<string>;
-}
-export declare class SocketControl {
-    handleEvent(data: string): string;
 }

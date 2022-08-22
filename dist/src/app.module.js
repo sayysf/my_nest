@@ -6,25 +6,20 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.IndexService = exports.AppService = void 0;
+exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
-const fs_1 = require("fs");
-let AppService = class AppService {
-    getHello() {
-        return 'Hello World!';
-    }
+const app_controller_1 = require("./app.controller");
+const index_service_1 = require("./index.service");
+const app_service_1 = require("./app.service");
+const events_module_1 = require("../events/events.module");
+let AppModule = class AppModule {
 };
-AppService = __decorate([
-    (0, common_1.Injectable)()
-], AppService);
-exports.AppService = AppService;
-let IndexService = class IndexService {
-    getRes() {
-        return (0, fs_1.readFileSync)(__dirname + "/../index.html").toString();
-    }
-};
-IndexService = __decorate([
-    (0, common_1.Injectable)()
-], IndexService);
-exports.IndexService = IndexService;
-//# sourceMappingURL=app.service.js.map
+AppModule = __decorate([
+    (0, common_1.Module)({
+        imports: [events_module_1.EventsModule],
+        controllers: [app_controller_1.AppController, app_controller_1.CatsController],
+        providers: [app_service_1.AppService, index_service_1.IndexService],
+    })
+], AppModule);
+exports.AppModule = AppModule;
+//# sourceMappingURL=app.module.js.map

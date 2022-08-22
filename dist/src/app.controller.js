@@ -12,9 +12,9 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SocketControl = exports.AppController = exports.CatsController = void 0;
+exports.AppController = exports.CatsController = void 0;
 const common_1 = require("@nestjs/common");
-const websockets_1 = require("@nestjs/websockets");
+const index_service_1 = require("./index.service");
 const app_service_1 = require("./app.service");
 let CatsController = class CatsController {
     constructor(appService) {
@@ -82,24 +82,7 @@ __decorate([
 ], AppController.prototype, "getHello", null);
 AppController = __decorate([
     (0, common_1.Controller)(),
-    __metadata("design:paramtypes", [app_service_1.IndexService])
+    __metadata("design:paramtypes", [index_service_1.IndexService])
 ], AppController);
 exports.AppController = AppController;
-let SocketControl = class SocketControl {
-    handleEvent(data) {
-        console.log(data);
-        return data;
-    }
-};
-__decorate([
-    (0, websockets_1.SubscribeMessage)('PRIV'),
-    __param(0, (0, websockets_1.MessageBody)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", String)
-], SocketControl.prototype, "handleEvent", null);
-SocketControl = __decorate([
-    (0, websockets_1.WebSocketGateway)(3000, { namespace: 'websocket' })
-], SocketControl);
-exports.SocketControl = SocketControl;
 //# sourceMappingURL=app.controller.js.map

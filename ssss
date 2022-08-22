@@ -1,0 +1,22 @@
+  /*
+    @SubscribeMessage("PRIV")
+    async handleEvent(client: Socket, data: string): Promise<string> {
+        //console.log(data)
+       // console.log(client);
+
+       console.log(data);
+        let send : string = data.substring(0, data.search(':'));
+
+        data.slice(0, data.search(':'));
+
+
+          console.log(send);
+          console.log(data);
+
+        console.log(client.emit(send, data))
+        
+        //  this.server.emit("PRIV", data);
+        return data;
+      }
+
+  */

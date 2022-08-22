@@ -14,9 +14,9 @@ let AppModule = class AppModule {
 };
 AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [],
-        controllers: [app_controller_1.AppController, app_controller_1.CatsController],
-        providers: [app_service_1.AppService],
+        imports: [EventsModule],
+        controllers: [app_controller_1.AppController, app_controller_1.CatsController, app_controller_1.SocketControl],
+        providers: [app_service_1.AppService, app_service_1.IndexService],
     })
 ], AppModule);
 exports.AppModule = AppModule;
