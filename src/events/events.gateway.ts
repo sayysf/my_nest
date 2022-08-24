@@ -51,8 +51,7 @@ import { IoAdapter } from '@nestjs/platform-socket.io';
     async gameEvent(client: any, data: any): Promise<string> {
     
         let com = JSON.parse(data);
-        console.log(com)
-       this.gameUsers.push({user: com.user, game: com.com, socket: client})
+       this.gameUsers.push({user : com.user, socket: client})
        console.log(this.gameUsers.length)
        while(this.gameUsers.length >= 2)
        {
@@ -81,7 +80,7 @@ import { IoAdapter } from '@nestjs/platform-socket.io';
        
         if (com.sender != '' && com.target != '')
         {
-          console.log(com)
+          //console.log(com)
             this.server.emit(com.target, data);
             return data;
         }

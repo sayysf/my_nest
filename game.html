@@ -36,6 +36,11 @@
       //Global letiables
       "use strict"
   
+      async function sleep(ms) {
+    return  await new Promise((resolve) => {
+      setTimeout(resolve, ms);
+    });
+  }
       const DIRECTION = {
         UP: 1,
         DOWN: 2,
@@ -87,13 +92,12 @@
            },
 
         initialize: function ()
-          {
+        {
       
             this.canvas = document.querySelector('canvas');
-            com_id =  this.getMyId();
             user_id =  this.getMyId();
 
-            socket.emit("GAME", JSON.stringify({user : user_id, com: com_id}))
+            socket.emit("GAME", JSON.stringify({user : user_id}))
             
           this.ctx = this.canvas.getContext('2d');
           this.canvas.width = 1000;
@@ -110,42 +114,59 @@
           this.running = this.over = false;
           this.round = 0;
   
-          socket.on("GAME", (data) =>{
-              console.log(data)
-
+          socket.on("GAME", (game_id) =>{
+              
 
               socket.on("DATA", (data) =>{
 
-              console.log(data)
+                this.ball = data.ball;
+                this.player= data.gamer1;
+                this.computer  = data.gamer2;
+                this.round = data.round;
+                this.over = data.over;
 
               })
             document.addEventListener('keydown', function (key) {
               if (key.keyCode === 38 || key.keyCode === 87)
               {
-                PongGame.player.move = DIRECTION.UP;
+                socket.emit("PRIV", JSON.stringify({
+                  sender: user_id,
+                  target : game_id,
+                  data : DIRECTION.UP                  
+                }))
+              }
 
-                // socket.emit("DATA", )
-              } //PongGame.player.move = DIRECTION.UP;
+              if (key.keyCode === 40 || key.keyCode === 83)
+              {
+                socket.emit("PRIV", JSON.stringify({
+                  sender: user_id,
+                  target : game_id,
+                  data : DIRECTION.DOWN                 
+                }))
+              }
 
-              // Handle down arrow and s key events
-              if (key.keyCode === 40 || key.keyCode === 83){
-                PongGame.player.move = DIRECTION.DOWN;
-              } //PongGame.player.move = DIRECTION.DOWN;
             });
 
               // Stop the player from moving when there are no keys being pressed.
-            document.addEventListener('keyup', function (key) { PongGame.player.move = DIRECTION.IDLE; });
+            document.addEventListener('keyup', function (key)
+            {
+              socket.emit("PRIV", JSON.stringify({
+                  sender: user_id,
+                  target : game_id,
+                  data : DIRECTION.IDLE                 
+                }))
+            });
             
-            PongGame.lobby();
-            PongGame.listeners();
+            this.lobby();
+            this.listeners();
               
          })
         },
   
         //STATIC
-        lobby: function () {
+        lobby: function (){
           //Draw elements static
-          PongGame.draw();
+          this.draw();
   
           //Text properity
           this.ctx.textBaseline = 'middle';
@@ -234,25 +255,23 @@
           );
         },
   
-        loop: function () {
-          // PongGame.update();
-          PongGame.draw();
-  
+        loop: async function () {
+          while (!this.over)
+          {
+          // this.update();
+            this.draw();
+           await sleep(50)
+          }
           // If game is not over (over variable === false), draw frames. requestAnimationFrame is method from Window Object.
-          if (!PongGame.over) requestAnimationFrame(PongGame.loop);
+         // if (!this.over) requestAnimationFrame(this.loop);
         },
+
         listeners: function () {
-          if (PongGame.running === false) {
-              PongGame.running = true;
-              window.requestAnimationFrame(PongGame.loop);
+          if (this.running === false) {
+              this.running = true;
+              this.loop()
             }
-
-   
-
-          //If push spacebar run the game (keycode 32 === spacebar) and call Window requestAnimationFrame method with my LOOP METHOD.
- 
         },
-  
   
         _endGame: function (text) {
           //White Rect for TEXT
@@ -270,11 +289,6 @@
             this.canvas.width / 2,
             this.canvas.height / 2 + 15
           );
-  
-          setTimeout(function () {
-            PongGame = Object.assign({}, Main);
-            PongGame.initialize();
-          }, 3000);
         },
       }
   

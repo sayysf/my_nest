@@ -34,8 +34,7 @@ let EventsGateway = class EventsGateway {
     }
     async gameEvent(client, data) {
         let com = JSON.parse(data);
-        console.log(com);
-        this.gameUsers.push({ user: com.user, game: com.com, socket: client });
+        this.gameUsers.push({ user: com.user, socket: client });
         console.log(this.gameUsers.length);
         while (this.gameUsers.length >= 2) {
             new run_service_1.RunService(this.gameUsers[0], this.gameUsers[1]);
@@ -52,7 +51,6 @@ let EventsGateway = class EventsGateway {
     async handleEvent(client, data) {
         let com = JSON.parse(data);
         if (com.sender != '' && com.target != '') {
-            console.log(com);
             this.server.emit(com.target, data);
             return data;
         }
