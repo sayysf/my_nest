@@ -30,6 +30,8 @@
 
 <body>
   <canvas></canvas>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
     <script>
       //Global letiables
       "use strict"
@@ -70,32 +72,74 @@
           }
         }
       }
-  
+
+      var socket = io();
+
+      var com_id;
+      var user_id;
+
+
+
       let Main = {
-        initialize: function () {
-          this.canvas = document.querySelector('canvas');
+
+        getMyId : function (){
+              return Math.random().toString(36).substring(2,7);
+           },
+
+        initialize: function ()
+          {
+      
+            this.canvas = document.querySelector('canvas');
+            com_id =  this.getMyId();
+            user_id =  this.getMyId();
+
+            socket.emit("GAME", JSON.stringify({user : user_id, com: com_id}))
+            
           this.ctx = this.canvas.getContext('2d');
-  
           this.canvas.width = 1000;
           this.canvas.height = 500;
-  
           this.canvas.style.width = 150 + 'vh';
           this.canvas.style.height = 75 + 'vh';
-  
           this.player = Paddle.new.call(this, 'left');
           this.computer = Paddle.new.call(this, 'right');
           this.ball = Ball.new.call(this);
-  
           this.tableLineHeight = 16;
           this.tableLineWidth = 6;
-  
           this.color = '#0000';
   
           this.running = this.over = false;
           this.round = 0;
   
-          PongGame.lobby();
-          PongGame.listeners();
+          socket.on("GAME", (data) =>{
+              console.log(data)
+
+
+              socket.on("DATA", (data) =>{
+
+              console.log(data)
+
+              })
+            document.addEventListener('keydown', function (key) {
+              if (key.keyCode === 38 || key.keyCode === 87)
+              {
+                PongGame.player.move = DIRECTION.UP;
+
+                // socket.emit("DATA", )
+              } //PongGame.player.move = DIRECTION.UP;
+
+              // Handle down arrow and s key events
+              if (key.keyCode === 40 || key.keyCode === 83){
+                PongGame.player.move = DIRECTION.DOWN;
+              } //PongGame.player.move = DIRECTION.DOWN;
+            });
+
+              // Stop the player from moving when there are no keys being pressed.
+            document.addEventListener('keyup', function (key) { PongGame.player.move = DIRECTION.IDLE; });
+            
+            PongGame.lobby();
+            PongGame.listeners();
+              
+         })
         },
   
         //STATIC
@@ -116,120 +160,9 @@
             500,
             500
           );
-  
-      /*    //Show welcome text
-          this.ctx.fillStyle = "black";
-          this.ctx.fillText('Press SPACEBAR to start',
-            this.canvas.width / 2,
-            this.canvas.height / 2 + 15
-          );*/
         },
   
         //MAIN METHOD - UPDATE VARIABLES AND GIVE IT TO LOOP METHOD.
-        update: function () {
-          if (!this.over) {
-            if (this.ball.yMove === DIRECTION.IDLE) {
-              PongGame._newRound.call(this, this.player);
-            }
-  
-            //
-            if (this.ball.x - this.ball.size <= 0) PongGame._newRound.call(this, this.computer, this.player);
-  
-            //Moving up/down, player updated by listeners
-            if (this.player.move === DIRECTION.UP) this.player.y -= this.player.speed;
-            else if (this.player.move === DIRECTION.DOWN) this.player.y += this.player.speed;
-  
-            //Player and computer collision with wall
-            if (this.player.y <= 0) this.player.y = 0;
-            else if (this.player.y >= (this.canvas.height - this.player.height)) this.player.y = (this.canvas.height - this.player.height);
-            if (this.computer.y >= this.canvas.height - this.computer.height) this.computer.y = this.canvas.height - this.computer.height;
-            else if (this.computer.y <= 0) this.computer.y = 0;
-  
-            //Move in Y - BALL
-            if (this.ball.y <= 0) { this.ball.yMove = DIRECTION.DOWN; }
-            else if (this.ball.y >= this.canvas.height - this.ball.size) { this.ball.yMove = DIRECTION.UP; }
-            if (this.ball.yMove === DIRECTION.DOWN) this.ball.y += this.ball.speed / 2;
-            else if (this.ball.yMove === DIRECTION.UP) this.ball.y -= this.ball.speed / 2;
-  
-            //Move in X - BALL
-            if (this.ball.x <= 0) {
-              PongGame._newRound.call(this, this.computer);
-            }
-            else if (this.ball.x >= this.canvas.width + this.ball.size) {
-              PongGame._newRound.call(this, this.player);
-            }
-            if (this.ball.xMove === DIRECTION.RIGHT) this.ball.x += this.ball.speed;
-            else if (this.ball.xMove === DIRECTION.LEFT) this.ball.x -= this.ball.speed;
-  
-            //BALL - PLAYER COLLISION
-            //1. Check ball x position with player x position and ball y position with player y position
-            if (this.ball.x <= this.player.x + this.player.width && this.player.y <= this.ball.y + this.ball.size) {
-              //2. If true check that ball not have x position less than player.
-              if (this.ball.x - this.ball.size >= this.player.x) {
-                //3. If true check that ball is in player paddel range.
-                if (this.player.y + this.player.height >= this.ball.y - this.ball.size) {
-                  //4. If true chech that is upper paddel.
-                  if (this.ball.y <= this.player.y + this.player.height / 2) {
-                    this.ball.xMove = DIRECTION.RIGHT;
-                    this.ball.yMove = DIRECTION.UP;
-                    this.ball.speed += Math.random() * (1 - 0.2) + 0.2;
-                    //5. If false check for lower paddel.
-                  } else if (this.ball.y >= this.player.y + this.player.height / 2) {
-                    this.ball.xMove = DIRECTION.RIGHT;
-                    this.ball.yMove = DIRECTION.DOWN;
-                    this.ball.speed += Math.random() * (1 - 0.2) + 0.2;
-                  
-                  }
-                }
-              }
-            }
-  
-            //BALL - COMPUTER COLLISION
-            //1. Check ball x position with player x position and ball y position with player y position
-            if (this.ball.x >= this.computer.x - this.computer.width && this.computer.y <= this.ball.y + this.ball.size) {
-              //2. If true check that ball not have x position less than computer.
-              if (this.ball.x + this.ball.size <= this.computer.x) {
-                //3. If true check that ball is in computer paddel range.
-                if (this.computer.y + this.computer.height >= this.ball.y - this.ball.size) {
-                  //4. If true chech that is upper paddel.
-                  if (this.ball.y <= this.computer.y + this.computer.height / 2) {
-                    this.ball.xMove = DIRECTION.LEFT;
-                    this.ball.yMove = DIRECTION.UP;
-                    this.ball.speed += .2;
-
-                    //5. If false check for lower paddel.
-                  } else if (this.ball.y >= this.computer.y + this.computer.height / 2) {
-                    this.ball.xMove = DIRECTION.LEFT;
-                    this.ball.yMove = DIRECTION.DOWN;
-                    this.ball.speed += .2;                 }
-                }
-              }
-            }
-  
-            //COMPUTER
-            if (this.computer.y > this.ball.y - (this.computer.height / 2)) {
-              if (this.ball.x > this.canvas.width / 2) this.computer.y -= 5
-              else this.computer.y -= 3;
-            }
-            if (this.computer.y < this.ball.y - (this.computer.height / 2)) {
-              if (this.ball.x > this.canvas.width / 2) this.computer.y += 5
-              else this.computer.y += 3;
-            }
-  
-            //End game
-            if (this.computer.score === 5 || this.player.score === 5) {
-              if (this.computer.score === 5) {
-                this.over = true
-                setTimeout(function () { PongGame._endGame('Computer'); }, 1000);
-              }
-              else if (this.player.score === 5) {
-                this.over = true
-                setTimeout(function () { PongGame._endGame('Player'); }, 1000);
-              }
-            }
-  
-          }
-        },
   
         draw: function () {
           //Clear whole Canvas.
@@ -302,59 +235,24 @@
         },
   
         loop: function () {
-          //Loop function, update all elements, then draw new.
-          PongGame.update();
+          // PongGame.update();
           PongGame.draw();
   
           // If game is not over (over variable === false), draw frames. requestAnimationFrame is method from Window Object.
           if (!PongGame.over) requestAnimationFrame(PongGame.loop);
         },
-  
         listeners: function () {
           if (PongGame.running === false) {
               PongGame.running = true;
               window.requestAnimationFrame(PongGame.loop);
             }
-          //If push spacebar run the game (keycode 32 === spacebar) and call Window requestAnimationFrame method with my LOOP METHOD.
-          document.addEventListener('keydown', function (key) {
-  
-  
-            // Handle up arrow and w key events
-            if (key.keyCode === 38 || key.keyCode === 87) PongGame.player.move = DIRECTION.UP;
-  
-            // Handle down arrow and s key events
-            if (key.keyCode === 40 || key.keyCode === 83) PongGame.player.move = DIRECTION.DOWN;
-          });
-  
-          // Stop the player from moving when there are no keys being pressed.
-          document.addEventListener('keyup', function (key) { PongGame.player.move = DIRECTION.IDLE; });
-        },
-  
-        _newRound: function (winner) {
-          this.ball = Ball.new.call(this);
-          let i ;
-          
-          i =  Math.floor(Math.random() * 2);
-          if (i == 1)
-            this.ball.xMove = DIRECTION.LEFT;
-          else
-            this.ball.xMove = DIRECTION.RIGHT;
-          i = Math.floor(Math.random() * 2);
-          if (i == 1)
-            this.ball.yMove = DIRECTION.UP;
-          else
-            this.ball.yMove = DIRECTION.DOWN;
 
-          //If it is start - clear scores.
-          if (this.round === 0) {
-            winner.score = 0;
-            this.round += 1;
-          }
-          else {
-            winner.score += 1;
-            this.round += 1;
-          }
+   
+
+          //If push spacebar run the game (keycode 32 === spacebar) and call Window requestAnimationFrame method with my LOOP METHOD.
+ 
         },
+  
   
         _endGame: function (text) {
           //White Rect for TEXT

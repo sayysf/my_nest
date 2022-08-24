@@ -1,4 +1,4 @@
-import { IndexService } from './index.service';
+import { IndexService } from 'src/index.service';
 import { AppService } from "./app.service";
 import { Request } from 'express';
 import { GameService } from './gameService';

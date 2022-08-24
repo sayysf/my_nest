@@ -1,6 +1,6 @@
 import { Body, Controller, Get, HttpCode, Req } from '@nestjs/common';
 import { MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
-import { IndexService } from './index.service';
+import { IndexService } from 'src/index.service';
 import { AppService } from "./app.service";
 import { Request } from 'express';
 import { send } from 'process';

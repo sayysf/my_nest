@@ -11,16 +11,43 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EventsGateway = void 0;
 const websockets_1 = require("@nestjs/websockets");
+const run_service_1 = require("./run.service");
 const socket_io_1 = require("socket.io");
 let EventsGateway = class EventsGateway {
+    constructor() {
+        this.gameUsers = [];
+    }
     handleDisconnect(client) {
-        console.log("disconnected");
+        for (let i = 0; i < this.gameUsers.length; i++) {
+            if (client.id == this.gameUsers[i].socket.id) {
+                this.gameUsers.splice(i, 1);
+                break;
+            }
+        }
+        console.log("disconnected = ", client.id);
     }
     handleConnection(client, ...args) {
         console.log("connected = " + client.id);
     }
     afterInit(server) {
         console.log("init");
+    }
+    async gameEvent(client, data) {
+        let com = JSON.parse(data);
+        console.log(com);
+        this.gameUsers.push({ user: com.user, game: com.com, socket: client });
+        console.log(this.gameUsers.length);
+        while (this.gameUsers.length >= 2) {
+            new run_service_1.RunService(this.gameUsers[0], this.gameUsers[1]);
+            this.gameUsers.splice(0, 1);
+            this.gameUsers.splice(0, 1);
+            console.log(this.gameUsers.length);
+        }
+        return data;
+    }
+    async hiiiEvent(client, data) {
+        console.log(data);
+        return data;
     }
     async handleEvent(client, data) {
         let com = JSON.parse(data);
@@ -36,6 +63,18 @@ __decorate([
     (0, websockets_1.WebSocketServer)(),
     __metadata("design:type", socket_io_1.Server)
 ], EventsGateway.prototype, "server", void 0);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('GAME'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], EventsGateway.prototype, "gameEvent", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('HIII'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], EventsGateway.prototype, "hiiiEvent", null);
 __decorate([
     (0, websockets_1.SubscribeMessage)('PRIV'),
     __metadata("design:type", Function),
