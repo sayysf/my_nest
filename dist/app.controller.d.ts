@@ -1,5 +1,7 @@
-import { AppService, IndexService } from './app.service';
+import { IndexService } from './index.service';
+import { AppService } from "./app.service";
 import { Request } from 'express';
+import { GameService } from './gameService';
 export declare class CatsController {
     private readonly appService;
     constructor(appService: AppService);
@@ -8,11 +10,13 @@ export declare class CatsController {
     mehmetali(): object;
     kotu(): string;
 }
-export declare class AppController {
+export declare class IndexController {
     private readonly appService;
     constructor(appService: IndexService);
     getHello(): Promise<string>;
 }
-export declare class SocketControl {
-    handleEvent(data: string): string;
+export declare class GameController {
+    private readonly appService;
+    constructor(appService: GameService);
+    getHello(): Promise<string>;
 }

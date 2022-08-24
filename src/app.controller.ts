@@ -6,6 +6,7 @@ import { Request } from 'express';
 import { send } from 'process';
 import { open, read, readFile, readFileSync } from 'fs';
 import { stringify } from 'querystring';
+import { GameService } from './gameService';
 
 @Controller('cats')
 export class CatsController {
@@ -30,12 +31,12 @@ export class CatsController {
   @Get('kotu')
     @HttpCode(400)
       kotu(): string {
-        return 'This is bad';
+        return 'This is so bad';
   }
 }
 
 @Controller()
-  export class AppController {
+  export class IndexController {
     constructor(private readonly appService: IndexService) {}
 
     @Get()
@@ -44,3 +45,16 @@ export class CatsController {
       }
 
   }
+
+
+  @Controller('game')
+  export class GameController {
+    constructor(private readonly appService: GameService) {}
+
+    @Get()
+      async getHello(): Promise<string> {
+        return this.appService.getRes();
+      }
+
+  }
+

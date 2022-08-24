@@ -9,14 +9,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const app_controller_1 = require("./app.controller");
+const index_service_1 = require("./index.service");
 const app_service_1 = require("./app.service");
+const events_module_1 = require("./events/events.module");
+const gameService_1 = require("./gameService");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [EventsModule],
-        controllers: [app_controller_1.AppController, app_controller_1.CatsController, app_controller_1.SocketControl],
-        providers: [app_service_1.AppService, app_service_1.IndexService],
+        imports: [events_module_1.EventsModule],
+        controllers: [app_controller_1.IndexController, app_controller_1.CatsController, app_controller_1.GameController],
+        providers: [app_service_1.AppService, index_service_1.IndexService, gameService_1.GameService],
     })
 ], AppModule);
 exports.AppModule = AppModule;

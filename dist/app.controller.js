@@ -12,10 +12,11 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SocketControl = exports.AppController = exports.CatsController = void 0;
+exports.GameController = exports.IndexController = exports.CatsController = void 0;
 const common_1 = require("@nestjs/common");
-const websockets_1 = require("@nestjs/websockets");
+const index_service_1 = require("./index.service");
 const app_service_1 = require("./app.service");
+const gameService_1 = require("./gameService");
 let CatsController = class CatsController {
     constructor(appService) {
         this.appService = appService;
@@ -31,7 +32,7 @@ let CatsController = class CatsController {
         return { name: 'ali', age: 31 };
     }
     kotu() {
-        return 'This is bad';
+        return 'This is so bad';
     }
 };
 __decorate([
@@ -66,7 +67,7 @@ CatsController = __decorate([
     __metadata("design:paramtypes", [app_service_1.AppService])
 ], CatsController);
 exports.CatsController = CatsController;
-let AppController = class AppController {
+let IndexController = class IndexController {
     constructor(appService) {
         this.appService = appService;
     }
@@ -79,27 +80,29 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
-], AppController.prototype, "getHello", null);
-AppController = __decorate([
+], IndexController.prototype, "getHello", null);
+IndexController = __decorate([
     (0, common_1.Controller)(),
-    __metadata("design:paramtypes", [app_service_1.IndexService])
-], AppController);
-exports.AppController = AppController;
-let SocketControl = class SocketControl {
-    handleEvent(data) {
-        console.log(data);
-        return data;
+    __metadata("design:paramtypes", [index_service_1.IndexService])
+], IndexController);
+exports.IndexController = IndexController;
+let GameController = class GameController {
+    constructor(appService) {
+        this.appService = appService;
+    }
+    async getHello() {
+        return this.appService.getRes();
     }
 };
 __decorate([
-    (0, websockets_1.SubscribeMessage)('PRIV'),
-    __param(0, (0, websockets_1.MessageBody)()),
+    (0, common_1.Get)(),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", String)
-], SocketControl.prototype, "handleEvent", null);
-SocketControl = __decorate([
-    (0, websockets_1.WebSocketGateway)(3000, { namespace: 'websocket' })
-], SocketControl);
-exports.SocketControl = SocketControl;
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], GameController.prototype, "getHello", null);
+GameController = __decorate([
+    (0, common_1.Controller)('game'),
+    __metadata("design:paramtypes", [gameService_1.GameService])
+], GameController);
+exports.GameController = GameController;
 //# sourceMappingURL=app.controller.js.map

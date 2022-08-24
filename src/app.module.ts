@@ -1,12 +1,14 @@
 import { Module } from '@nestjs/common';
-import { AppController, CatsController } from './app.controller';
+import { IndexController, CatsController, GameController } from './app.controller';
 import { IndexService } from './index.service';
 import { AppService } from "./app.service";
-import { EventsModule } from 'events/events.module';
+import { EventsModule } from 'src/events/events.module';
+import { GameModule } from 'src/game/game.module';
+import { GameService } from './gameService';
 
 @Module({
   imports: [EventsModule],
-  controllers: [AppController, CatsController],
-  providers: [AppService, IndexService],
+  controllers: [IndexController, CatsController, GameController],
+  providers: [AppService, IndexService, GameService],
 })
 export class AppModule {}
